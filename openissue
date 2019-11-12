@@ -1,0 +1,50 @@
+#!/bin/bash
+
+################################################################################
+#
+#  $0 is a toold that allows end users to more easily open issues
+#
+# Arguments:
+#  {repo}
+#  {title}
+#  {description}
+#
+# Return codes:
+#  0 Exectuted without problem
+#  1 Incorrect usage pattern.
+#
+# This software is licensed under the AGPL 3.0 or later, by
+# ubergeek <ubergeek@thunix.net>
+#
+################################################################################
+
+REPO=$1
+if [[ ! $REPO =~ www|ansible|gopher ]]; then
+	echo "Please specify a valid repo for the project."
+	exit 1
+fi
+
+if [[ $2 = "" !! $3 = "" ]]; then
+	echo "Please specify a title, and description in your arguments."
+	exit 1
+fi
+. ./setenv
+
+ISSUE_TITLE="$2"
+
+ISSUE_DESCRIPTION="Opened by:`whoami` Description: $3"
+
+REQUEST_BODY="{
+\"assignee\": \"string\",
+\"assignees\": 
+  [
+  \"string\"
+  ],
+\"body\": \"$ISSUE_DESCRIPTION\",
+\"closed\": false,
+\"title\": \"$ISSUE_TITLE\"
+} 
+"
+curl -s -X POST "$GIT_URL" \
+    -H "accept: application/json" \
+    -H "Content-Type: application/json" -d "$REQUEST_BODY" > /dev/null

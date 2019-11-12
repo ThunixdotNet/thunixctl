@@ -1,0 +1,100 @@
+#!/bin/bash
+
+################################################################################
+#
+#  $0 is a toold that allows end users to execute simple admin tasks.
+#
+# Arguments:
+#  {service}
+#  {action}
+#
+# Return codes:
+#  0 Exectuted without problem
+#  1 Incorrect usage pattern.
+#
+# This software is licensed under the AGPL 3.0 or later, by
+# ubergeek <ubergeek@thunix.net>
+#
+################################################################################
+
+NOUN=$1
+VERB=$2
+
+function usage() {
+	cat << _EOF
+$0 {service} {action}
+
+  $0 is a tool that allows for end-user execution of simple administrative tasks, in a secure fashion.
+
+  {service} and {action} are required arguments.
+_EOF
+	return
+}
+
+function ansible() {
+	case $VERB in
+		run)
+			echo "Running the ansible playbok..."
+			CURDIR=`pwd`
+			cd /var/thunix/ansible/
+			git pull
+			cd $CURDIR
+			ansible-playbook -i /var/thunix/ansible/hosts /var/thunix/ansible/site.yml
+		;;
+		pull)
+			echo "Pulling the latest playbook..."
+			CURDIR=`pwd`
+			cd /var/thunix/ansible/
+			git pull
+			cd $CURDIR
+		;;
+		*)
+			echo "That action was not recognized."
+			usage
+		;;
+	esac
+	return
+}
+
+function www() {
+	if [ $NOUN = "www" ]; then 
+		WORKDIR="/var/www/thunix.cf"
+	fi
+	if [ $NOUN = "gopher" ]; then 
+		WORKDIR="/var/gopher"
+	fi
+  case $VERB in
+    pull)
+			echo "Pulling the latest $NOUN..."
+      CURDIR=`pwd`
+			cd $WORKDIR
+			git pull
+			cd $CURDIR
+    ;;
+		*)
+			echo "That action was not recognized."
+			usage
+			exit 1
+		;;
+		esac
+		return
+}
+
+
+case $NOUN in
+	ansible)
+		echo ansible
+		ansible
+		exit 0
+	;;
+	www|gopher)
+		echo www
+		www
+		exit 0
+	;;
+	*)
+		echo fail
+		usage
+		exit 1
+	;;
+esac
