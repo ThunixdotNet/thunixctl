@@ -20,6 +20,8 @@
 NOUN=$1
 VERB=$2
 
+###
+# Functions
 function usage() {
 	cat << _EOF
 $0 {service} {action}
@@ -80,20 +82,52 @@ function www() {
 		return
 }
 
+function manpages () {
+
+	case $VERB in
+		pull)
+			echo "Refreshing system documentation..."
+			CURDIR=`pwd`
+			cd /usr/local/man/man8
+			git pull
+			cd $CURDIR
+		;;
+		*)
+			echo "That action was not recognized."
+			usage
+			exit 1
+		;;
+	esac
+	return 
+}
+
+function aptupgrade() {
+	apt update
+	apt upgrade -y
+	return
+}
+
+###
+# Begin main part
 
 case $NOUN in
 	ansible)
-		echo ansible
 		ansible
 		exit 0
 	;;
 	www|gopher)
-		echo www
 		www
 		exit 0
 	;;
+	manpages)
+		manpages
+		exit 0
+	;;
+ 	update)
+		aptupgrade
+		exit 0
+	;;
 	*)
-		echo fail
 		usage
 		exit 1
 	;;
