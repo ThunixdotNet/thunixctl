@@ -1,6 +1,6 @@
 # thunixctl
 
-These are a set of tools to allow users to carry out basic administrative tasks, in a secure manner. This tool isn't written set, and this doc acts as a spec.
+These are a set of tools to allow users to carry out basic administrative tasks, in a secure manner. This tool isn't written set, and this doc acts as a specification.
 
 # thunixctl
 
